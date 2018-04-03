@@ -27,9 +27,32 @@ Get the current temperature recorded by the sensor with the specified ID as a ur
 
 Get all available IDs
 
+#### Example response
+```
+	19.625
+```
+
+#### Example response
+
+```json
+	[
+	  "28-0517602a31ff",
+	  "28-051760a9aaff"
+	]
+```
+
 ### /sensors/all/
 
 Get the temperature readings for all connected sensors.
+
+#### Example response:
+
+```json
+	{
+	  "28-0517602a31ff": 19.625,
+	  "28-051760a9aaff": 18.562
+	}
+```
 
 
 
