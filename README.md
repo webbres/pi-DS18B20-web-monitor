@@ -14,10 +14,13 @@ The data is stored in an H2 database ~/.temperature/data
 See [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) for documentation of the 
 resources.
 
-## Resources
+# Resources
 
 These resources are all GET requests and the URL is relative to the base. If running as a spring boot standalone application this will
 be http://localhost:8080 and will vary if deployed in tomcat.
+
+
+## Live sensor data
 
 ### /sensors/{id}/
 
@@ -54,6 +57,18 @@ Get the temperature readings for all connected sensors.
 	}
 ```
 
+## Historical sensor data
+
+### /data/{sensor}/record/count
+
+Returns the count of the number of records recorded for the named sensor
+
+#### Example output
+http://localhost:8080/data/28-051760a9aaff/record/count
+
+```
+	6261
+```
 
 
 # Building and Deploying

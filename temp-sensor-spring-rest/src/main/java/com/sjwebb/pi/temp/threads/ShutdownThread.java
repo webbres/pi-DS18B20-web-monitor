@@ -1,6 +1,6 @@
 package com.sjwebb.pi.temp.threads;
 
-import com.sjwebb.pi.temp.database.SensorDataDatabase;
+import com.sjwebb.pi.temp.database.SensorDatabaseManager;
 
 /**
  * Handle graceful shutdown of the application
@@ -9,9 +9,9 @@ import com.sjwebb.pi.temp.database.SensorDataDatabase;
  */
 public 	class ShutdownThread extends Thread
 {
-	private SensorDataDatabase database;
+	private SensorDatabaseManager database;
 	
-	public ShutdownThread(SensorDataDatabase database)
+	public ShutdownThread(SensorDatabaseManager database)
 	{
 		this.database = database;
 	}

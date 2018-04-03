@@ -1,10 +1,12 @@
 package com.sjwebb.pi.temp.threads;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.List;
 
-import com.sjwebb.pi.temp.database.SensorDataDatabase;
+import com.sjwebb.pi.temp.database.SensorDatabaseManager;
+import com.sjwebb.pi.temp.database.SensorDatabaseSupport;
 import com.sjwebb.pi.temp.sensor.SensorHelper;
 
 /**
@@ -16,11 +18,12 @@ import com.sjwebb.pi.temp.sensor.SensorHelper;
 public class MonitorThread extends Thread {
 
 	private List<String> sensorNames;
-	private SensorDataDatabase database;
+	private SensorDatabaseSupport database;
 	
-	public MonitorThread(List<String> sensorNames, SensorDataDatabase database) {
+	public MonitorThread(List<String> sensorNames) throws SQLException {
 		this.sensorNames = sensorNames;
-		this.database = database;
+		
+		this.database = new SensorDatabaseSupport(SensorDatabaseManager.INSTANCE.createConnection());
 	}
 
 	@Override
@@ -39,12 +42,6 @@ public class MonitorThread extends Thread {
 					e.printStackTrace();
 				}
 			}
-
-//			try {
-//				printTemperatures(sensorNames);
-//			} catch (IOException e1) {
-//				e1.printStackTrace();
-//			}
 
 			// Now wait for the interval period to then record the next temperatures
 			try {

@@ -1,37 +1,47 @@
 package com.sjwebb.pi.temp.database;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import org.h2.tools.Server;
 
-/**
- * Simple interaction and management of a H2 database to store the sensor data.
- * 
- * @author Sam Webb
- *
- */
-public class SensorDataDatabase {
+public class SensorDatabaseManager {
+
 	
 	// TODO: allow to be specified in application properties?
 	/** Location for the database */
 	public static final String DATABASE_PATH = "~/.temperature/data";
-
+	
 	public static final String SCHEMA_NAME = "PI_TEMP_DATA";
 	
-	private PreparedStatement addData;
+	public static final String RESULT_TABLE_NAME = "RESULTS";
+	
+	public static final String FULLY_QUALIFIED_RESULT_TABLE_NAME = SCHEMA_NAME + "." + RESULT_TABLE_NAME;
+	
+	private static String DATABASE_CONNECTION = "jdbc:h2:tcp://localhost/" + DATABASE_PATH;
 	
 	private Server server;
 	
-	public SensorDataDatabase() throws SQLException {
-		createConnection();
-	}
+	public static SensorDatabaseManager INSTANCE;
+	
 
-	private Connection createConnection() throws SQLException {
+	protected SensorDatabaseManager() throws SQLException
+	{
+		initialise();
+	}
+	
+	public static SensorDatabaseManager getInstance() throws SQLException
+	{
+		if(INSTANCE == null)
+			INSTANCE = new SensorDatabaseManager();
+		
+		return INSTANCE;
+	}
+	
+	
+	private Connection initialise() throws SQLException {
 		
 		// TODO: change to a logger instead of sysout
 		System.out.println("Starting database server");
@@ -45,15 +55,17 @@ public class SensorDataDatabase {
 		//			of this application
 //		Connection conn = DriverManager.getConnection("jdbc:h2:" + DATABASE_PATH);
 		
-		Connection conn = DriverManager.getConnection("jdbc:h2:tcp://localhost/" + DATABASE_PATH);
+		Connection conn = createConnection();
 
 		initDB(conn);
 		
-		addData = conn.prepareStatement("INSERT INTO " + SCHEMA_NAME + ".RESULTS(sensor, temp) VALUES(?, ?);");
-
 		return conn;
 	}
-
+	
+	public Connection createConnection() throws SQLException {
+		return DriverManager.getConnection(DATABASE_CONNECTION);
+	}
+	
 	/**
 	 * Running as a server allows other connections to the database
 	 * @throws SQLException
@@ -69,7 +81,7 @@ public class SensorDataDatabase {
 	public void stopServer() {
 		server.stop();
 	}
-
+	
 	/**
 	 * Initialise the database if it does not already exist
 	 * @param conn
@@ -93,7 +105,7 @@ public class SensorDataDatabase {
 			System.out.println("Database already exists");
 		}
 	}
-
+	
 	/**
 	 * Create the database schema allowing for storing the sensor data with
 	 * time stamp.
@@ -114,23 +126,6 @@ public class SensorDataDatabase {
 		
 		conn.createStatement().executeUpdate(createSchema);
 	}
-	
-	/**
-	 * Log the sensor data into the database
-	 * 
-	 * @param sensor	The unique sensor name
-	 * @param temp		The temperature reading of the sensor
-	 * @throws SQLException
-	 * @throws IOException
-	 */
-	public void logResult(String sensor, double temp) throws SQLException, IOException {
-		addData.setString(1, sensor);
-		addData.setDouble(2, temp);
-		
-		int rowCount = addData.executeUpdate();
-		
-		if(rowCount != 1)
-			throw new IOException("Expected to add 1 row but added " + rowCount);
-	}
+
 
 }
