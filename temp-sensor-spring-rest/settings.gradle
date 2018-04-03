@@ -1,0 +1,3 @@
+include 'pi.temp.sensor'
+
+rootProject.name = 'pi.temp.sensor.rest'
