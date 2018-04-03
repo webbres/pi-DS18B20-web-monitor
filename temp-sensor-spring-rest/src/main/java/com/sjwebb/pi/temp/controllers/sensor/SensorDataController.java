@@ -13,10 +13,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.sjwebb.pi.temp.sensor.SensorHelper;
 
+/**
+ * Provides REST resources for interaction with live sensor data
+ * 
+ * @author Sam Webb
+ *
+ */
 @RequestMapping("/sensors")
 @RestController
 public class SensorDataController {
 
+	/**
+	 * Get the current reading of the named sensor
+	 * @param id
+	 * @return
+	 * @throws IOException
+	 */
 	@RequestMapping(value = "/{id}/", method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_UTF8_VALUE })
 	public double getSensorReading(@PathVariable("id") String id) throws IOException {
 
@@ -26,9 +38,14 @@ public class SensorDataController {
 			throw new IOException("Sensor with id " + id + " is not known. Possible values: " + names);
 		}
 
-		return SensorHelper.readTemperatureForSensor(id);
+		return SensorHelper.getTemperatureForSensor(id);
 	}
 
+	/**
+	 * Get the available sensor IDs
+	 * @return
+	 * @throws IOException
+	 */
 	@RequestMapping(value = "/ids/", method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_UTF8_VALUE })
 	public List<String> getSensorNames() throws IOException {
 
@@ -37,6 +54,13 @@ public class SensorDataController {
 		return names;
 	}
 
+	/**
+	 * List all of the sensors data in Map. Expected to output as a series of key value pairs once converted with
+	 * Jackson.
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
 	@RequestMapping(value = "/all/", method = RequestMethod.GET, produces = { MediaType.APPLICATION_JSON_UTF8_VALUE })
 	public Map<String, Double> getAllSensorValues() throws IOException {
 
@@ -45,7 +69,7 @@ public class SensorDataController {
 		Map<String, Double> values = new TreeMap<String, Double>();
 
 		for (String name : names) {
-			double temp = SensorHelper.readTemperatureForSensor(name);
+			double temp = SensorHelper.getTemperatureForSensor(name);
 
 			values.put(name, temp);
 		}

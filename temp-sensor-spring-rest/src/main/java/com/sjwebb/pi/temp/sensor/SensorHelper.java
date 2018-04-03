@@ -62,7 +62,7 @@ public class SensorHelper {
 	 * @return
 	 * @throws IOException
 	 */
-	public static double readTemperatureForSensor(String name) throws IOException
+	public static double getTemperatureForSensor(String name) throws IOException
 	{	
 		File deviceFile = new File(BASE_DIR + name + SENSOR_FILE);
 		
@@ -106,7 +106,7 @@ public class SensorHelper {
 		
 		for(String name : sensorNames)
 		{
-			temps.add(readTemperatureForSensor(name));
+			temps.add(getTemperatureForSensor(name));
 		}
 		
 		return temps;

@@ -9,8 +9,16 @@ import java.sql.SQLException;
 
 import org.h2.tools.Server;
 
-public class Database {
-
+/**
+ * Simple interaction and management of a H2 database to store the sensor data.
+ * 
+ * @author Sam Webb
+ *
+ */
+public class SensorDataDatabase {
+	
+	// TODO: allow to be specified in application properties?
+	/** Location for the database */
 	public static final String DATABASE_PATH = "~/.temperature/data";
 
 	public static final String SCHEMA_NAME = "PI_TEMP_DATA";
@@ -19,18 +27,22 @@ public class Database {
 	
 	private Server server;
 	
-	public Database() throws SQLException {
+	public SensorDataDatabase() throws SQLException {
 		createConnection();
 	}
 
 	private Connection createConnection() throws SQLException {
 		
+		// TODO: change to a logger instead of sysout
 		System.out.println("Starting database server");
 		startServer();
 		System.out.println("Server status: " + server.getStatus());
 		System.out.println("Server url: " + server.getURL());
 		System.out.println("Server port: " + server.getPort());
 
+		// TODO: 	allow property to specify embedded vs server mode?
+		// 			server mode allows connections to the database outside
+		//			of this application
 //		Connection conn = DriverManager.getConnection("jdbc:h2:" + DATABASE_PATH);
 		
 		Connection conn = DriverManager.getConnection("jdbc:h2:tcp://localhost/" + DATABASE_PATH);
@@ -51,10 +63,18 @@ public class Database {
 		server.start();
 	}
 	
+	/**
+	 * Stop the database server
+	 */
 	public void stopServer() {
 		server.stop();
 	}
 
+	/**
+	 * Initialise the database if it does not already exist
+	 * @param conn
+	 * @throws SQLException
+	 */
 	private void initDB(Connection conn) throws SQLException {
 		ResultSet schemas = conn.createStatement().executeQuery("SHOW SCHEMAS");
 
@@ -93,7 +113,6 @@ public class Database {
 				"ALTER TABLE  PI_TEMP_DATA.RESULTS ADD PRIMARY KEY (index);";
 		
 		conn.createStatement().executeUpdate(createSchema);
-		
 	}
 	
 	/**

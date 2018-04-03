@@ -10,11 +10,17 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-import com.sjwebb.pi.temp.database.Database;
+import com.sjwebb.pi.temp.database.SensorDataDatabase;
 import com.sjwebb.pi.temp.sensor.SensorHelper;
 import com.sjwebb.pi.temp.threads.MonitorThread;
 import com.sjwebb.pi.temp.threads.ShutdownThread;
 
+/**
+ * Spring boot application entry point. Starts up the underlying application (database) and sets of the 
+ * sensor monitoring. 
+ * @author samwe
+ *
+ */
 @EnableWebMvc
 @SpringBootApplication
 public class Application {
@@ -30,7 +36,9 @@ public class Application {
 	}
 
 	
-	
+	/**
+	 * Start the H2 database and trigger the monitoring
+	 */
 	public static void start()
 	{
 		// Get the initial sensor list
@@ -50,16 +58,17 @@ public class Application {
 		}
 		
 		// Start the database
-		Database database = null;
+		SensorDataDatabase database = null;
 		try 
 		{
-			database = new Database();
+			database = new SensorDataDatabase();
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 			System.out.println("Error with database");
 			System.exit(1);
 		}
 		
+		// TODO: does this still work after wrapping in Spring Boot?
 		createShutdownHook(database);
 		
 		System.out.println("Shutdown with Ctrl + C");
@@ -74,7 +83,7 @@ public class Application {
 	 * Create a shutdown hook to enable graceful termination of the application
 	 * @param database
 	 */
-	private static void createShutdownHook(Database database) {
+	private static void createShutdownHook(SensorDataDatabase database) {
 		
 		ShutdownThread thread = new ShutdownThread(database);
 		Runtime.getRuntime().addShutdownHook(thread);

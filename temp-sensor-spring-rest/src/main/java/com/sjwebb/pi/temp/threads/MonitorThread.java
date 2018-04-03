@@ -4,21 +4,21 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
-import com.sjwebb.pi.temp.database.Database;
+import com.sjwebb.pi.temp.database.SensorDataDatabase;
 import com.sjwebb.pi.temp.sensor.SensorHelper;
 
 /**
- * Handle graceful shutdown of the application
+ * Regularly poll the sensor files to get the temperature data
  * 
- * @author Sam
+ * @author Sam Webb
  *
  */
 public class MonitorThread extends Thread {
 
 	private List<String> sensorNames;
-	private Database database;
+	private SensorDataDatabase database;
 	
-	public MonitorThread(List<String> sensorNames, Database database) {
+	public MonitorThread(List<String> sensorNames, SensorDataDatabase database) {
 		this.sensorNames = sensorNames;
 		this.database = database;
 	}
@@ -32,7 +32,7 @@ public class MonitorThread extends Thread {
 			for (String sensor : sensorNames) {
 				try {
 
-					double temp = SensorHelper.readTemperatureForSensor(sensor);
+					double temp = SensorHelper.getTemperatureForSensor(sensor);
 					database.logResult(sensor, temp);
 
 				} catch (Exception e) {
@@ -40,11 +40,11 @@ public class MonitorThread extends Thread {
 				}
 			}
 
-			try {
-				printTemperatures(sensorNames);
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+//			try {
+//				printTemperatures(sensorNames);
+//			} catch (IOException e1) {
+//				e1.printStackTrace();
+//			}
 
 			// Now wait for the interval period to then record the next temperatures
 			try {
